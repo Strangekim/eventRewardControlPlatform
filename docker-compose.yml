@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  auth:
+    build: ./auth
+    platform: linux/amd64
+    ports:
+      - "3001:3000"
+    depends_on:
+      - mongo-auth
+    env_file:
+      - ./auth/.env
+    networks:
+      - ercp-network
+
+  event:
+    build: ./event
+    platform: linux/amd64
+    ports:
+      - "3002:3000"
+    depends_on:
+      - mongo-event
+    env_file:
+      - ./event/.env
+    networks:
+      - ercp-network
+
+  gateway:
+    build: ./gateway
+    platform: linux/amd64
+    ports:
+      - "3000:3000"
+    networks:
+      - ercp-network
+
+  mongo-auth:
+    image: mongo:6.0
+    platform: linux/amd64
+    container_name: mongo-auth
+    restart: always
+    ports:
+      - "27017:27017"   # 필요 시 제거 (외부 접근 차단용)
+    volumes:
+      - mongo-auth-data:/data/db
+    networks:
+      - ercp-network
+
+  mongo-event:
+    image: mongo:6.0
+    platform: linux/amd64
+    container_name: mongo-event
+    restart: always
+    ports:
+      - "27018:27017"   # 필요 시 제거
+    volumes:
+      - mongo-event-data:/data/db
+    networks:
+      - ercp-network
+
+volumes:
+  mongo-auth-data:
+  mongo-event-data:
+
+networks:
+  ercp-network:
+    driver: bridge
