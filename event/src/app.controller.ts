@@ -15,6 +15,6 @@ export class AppController {
 export class PingController {
   @Get()
   getPong() {
-    return { message: 'ponggggggg' };
+    return { message: '마라탕사주세요' };
   }
 }

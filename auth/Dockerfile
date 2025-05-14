@@ -17,4 +17,4 @@ COPY . .
 RUN npm run build
 
 # 7. 앱 실행 (빌드된 JS 파일 실행)
-CMD ["node", "dist/main"]
+CMD ["npm", "run", "start:dev"]
