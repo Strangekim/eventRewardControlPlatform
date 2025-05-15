@@ -28,7 +28,7 @@ export class AppController {
 
     const forwardedUrl = originalUrl.replace(`/${prefix}`, ''); // /auth/ping → /ping
     const url = targetBaseUrl + (forwardedUrl || '/');
-
+    console.log(url)
     try {
       const response = await firstValueFrom(
         this.httpService.request({

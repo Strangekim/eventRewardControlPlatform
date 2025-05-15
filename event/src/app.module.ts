@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppController,PingController } from './app.controller';
+import { PingController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,7 +11,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     MongooseModule.forRoot(process.env.MONGO_URI!),
   ],
-  controllers: [AppController,PingController],
+  controllers: [PingController],
   providers: [AppService],
 })
 export class AppModule {}

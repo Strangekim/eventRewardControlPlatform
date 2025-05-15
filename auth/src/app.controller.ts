@@ -1,20 +1,21 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Post, Body, Get } from '@nestjs/common';
+import { AuthService } from './app.service';
+import { CreateUserDto } from './dto/create_user.dto';
+import { get } from 'mongoose';
 
-@Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+@Controller('') // => /auth 경로 아래
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Post('register') 
+  async register(
+    @Body() createUserDto: CreateUserDto, ): Promise<{ message: string }> {
+    await this.authService.register(createUserDto);
+    return { message: '회원가입이 완료되었습니다.' };
   }
-}
 
-@Controller('pong')
-export class PingController {
-  @Get()
+  @Get('ping') // → GET /auth/ping
   getPong() {
-    return { message: '탕탕후루후루' };
+    return { message: '엔트리를 sdsdsdsdsdsd바꿨습니다' };
   }
 }
