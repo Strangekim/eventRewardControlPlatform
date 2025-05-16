@@ -1,7 +1,9 @@
-import { Controller, All, Req, Res, Get } from '@nestjs/common';
+import { Controller, All, Req, Res, Get, HttpException,HttpStatus,UseGuards } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Request, Response } from 'express';
 import { firstValueFrom } from 'rxjs';
+import { AuthGuard } from '@nestjs/passport';
+import { OptionalJwtAuthGuard } from './auth/optional-jwt-auth-guard';
 
 @Controller()
 export class AppController {
@@ -11,31 +13,38 @@ export class AppController {
   private readonly routingTable: Record<string, string> = {
     auth: 'http://auth:3000',
     event: 'http://event:3000',
-    // 예: user: 'http://user:3000'
   };
 
+  @UseGuards(OptionalJwtAuthGuard)
   @All('*')
   async proxy(@Req() req: Request, @Res() res: Response) {
     const { method, originalUrl, body, headers } = req;
+    const user = (req as any).user;
 
-    // ex) 'auth', 'event' 엔트리포인트에서 추출
-    const prefix = originalUrl.split('/')[1]; 
+    const prefix = originalUrl.split('/')[1];
     const targetBaseUrl = this.routingTable[prefix];
-
     if (!targetBaseUrl) {
-      return res.status(404).json({ message: 'Unknown route prefix' });
+      throw new HttpException('엔트리 포인트가 잘못되었습니다', HttpStatus.NOT_FOUND);
     }
 
-    const forwardedUrl = originalUrl.replace(`/${prefix}`, ''); // /auth/ping → /ping
-    const url = targetBaseUrl + (forwardedUrl || '/');
-    console.log(url)
+    const forwardedUrl = originalUrl.replace(`/${prefix}`, '') || '/';
+    const url = targetBaseUrl + forwardedUrl;
+
+    const { 'content-length': _, ...safeHeaders } = headers;
+
     try {
       const response = await firstValueFrom(
         this.httpService.request({
           method: method as any,
           url,
           data: body,
-          headers,
+          headers: {
+            ...safeHeaders,
+            'Content-Type': 'application/json',
+            'x-user-id': user?.id || '',
+            'x-user-role': user?.role || '',
+            'x-user-username': user?.username || '',
+          },
         }),
       );
 
@@ -44,7 +53,7 @@ export class AppController {
       console.error(`[Gateway Error] ${method} ${originalUrl} → ${url}`, error?.message);
       return res
         .status(error.response?.status || 500)
-        .json(error.response?.data || { message: 'Gateway error' });
+        .json(error.response?.data || { message: '게이트웨이 서버 에러' });
     }
   }
 }

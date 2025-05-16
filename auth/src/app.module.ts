@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt'
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './app.controller';
@@ -21,6 +22,15 @@ import { User, UserSchema } from './schemas/user.schema';
 
     // User 모델 등록
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get('JWT_SECRET'),
+        signOptions: { expiresIn: config.get('JWT_EXPIRES_IN') || '1h' },
+      }),
+    }),
   ],
   controllers: [AuthController],
   providers: [AuthService],
