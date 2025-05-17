@@ -30,7 +30,7 @@
 
 ## 컬렉션 구조
 ```json
-// user 컬렉션
+user 컬렉션
 {
   "_id": ObjectId,
   "username": "ironblack",
@@ -61,7 +61,7 @@
 ```
 
 ```json
-// reward_requests 보상 요청 기록
+reward_requests 보상 요청 기록
 {
   "_id": ObjectId,
   "eventId": ObjectId("..."),
@@ -73,7 +73,7 @@
 }
 ```
 ```json
-// reward 보상 컬렉션
+reward 보상 컬렉션
 {
   "_id": ObjectId,
   "eventId": ObjectId("..."), // FK to events._id
@@ -86,7 +86,7 @@
 }
 ```
 ```json
-// 이벤트 컬렉션
+이벤트 컬렉션
 {
   "_id": ObjectId,
   "name": "3일 연속 로그인 이벤트",

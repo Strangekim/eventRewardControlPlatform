@@ -1,15 +1,38 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Body, Controller, Post, Get, Param, Patch } from '@nestjs/common';
+import { EventService } from './app.service';
+import { Event } from './schemas/event.schemas';
+import { CreateEventDto,CreateRewardDto } from './dto/event.dto';
 
-@Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+@Controller('')
+export class EventController {
+  constructor(private readonly eventService: EventService) {}
+
+  @Post('create')
+  async createEvent(@Body() dto: CreateEventDto) {
+    return this.eventService.createEvent(dto);
+  }
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  async getAllEvents() {
+    return this.eventService.getAllEvents();
+  }
+
+  @Get(':id')
+  async getEventById(@Param('id') id: string) {
+    return this.eventService.getEventById(id);
+  }
+
+  @Post(':id/reward')
+  async addRewardToEvent(@Param('id') id: string, @Body() dto: CreateRewardDto) {
+    return this.eventService.createReward({ ...dto, eventId: id });
+  }
+
+  @Patch(':id/status')
+  async deactivateEvent(@Param('id') id: string) {
+    return this.eventService.deactivateEvent(id);
   }
 }
+
 
 @Controller('ping')
 export class PingController {

@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PingController } from './app.controller';
-import { AppService } from './app.service';
+import { PingController,EventController } from './app.controller';
+import { EventService } from './app.service';
+import { Event, EventSchema } from './schemas/event.schemas';
+import { Reward, RewardSchema } from './schemas/reward.schemas';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -10,8 +12,13 @@ import { MongooseModule } from '@nestjs/mongoose';
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.MONGO_URI!),
+
+    MongooseModule.forFeature([
+      { name: Event.name, schema: EventSchema },
+      { name: Reward.name, schema: RewardSchema },
+    ])
   ],
-  controllers: [PingController],
-  providers: [AppService],
+  controllers: [PingController,EventController],
+  providers: [EventService],
 })
 export class AppModule {}

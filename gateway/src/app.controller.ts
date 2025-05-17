@@ -31,7 +31,7 @@ export class AppController {
     const url = targetBaseUrl + forwardedUrl;
 
     const { 'content-length': _, ...safeHeaders } = headers;
-
+    console.log(url)
     try {
       const response = await firstValueFrom(
         this.httpService.request({
