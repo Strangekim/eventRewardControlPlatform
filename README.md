@@ -93,7 +93,7 @@ reward 보상 컬렉션
   "type": "login-streak",
   "description": "3일 연속 로그인 시 보상 지급",
   "conditions": {
-    "login_days": 3
+    
   },
   "status": "active",
   "startAt": ISODate("2025-05-15T00:00:00Z"),

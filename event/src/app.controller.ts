@@ -1,6 +1,7 @@
-import { Body, Controller, Post, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Patch, ForbiddenException } from '@nestjs/common';
 import { EventService } from './app.service';
 import { Event } from './schemas/event.schemas';
+import { CurrentUser } from './common/current-user.decorator'
 import { CreateEventDto,CreateRewardDto } from './dto/event.dto';
 
 @Controller('')
@@ -28,7 +29,11 @@ export class EventController {
   }
 
   @Patch(':id/status')
-  async deactivateEvent(@Param('id') id: string) {
+  async deactivateEvent(@Param('id') id: string, @CurrentUser() user,) {
+    console.log(user)
+    if (user.role !== 'admin') {
+      throw new ForbiddenException('관리자만 역할 변경이 가능합니다.');
+    }
     return this.eventService.deactivateEvent(id);
   }
 }

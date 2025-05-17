@@ -15,11 +15,6 @@ export class AuthController {
     return { message: '회원가입이 완료되었습니다.' };
   }
 
-  @Get('login') // → GET /auth/ping
-  getPong() {
-    return { message: '엔트리를 sdsdsdsdsdsd바꿨습니다' };
-  }
-
   @Get('users')
   async getAllUsers() {
     return this.authService.findAllUsers();

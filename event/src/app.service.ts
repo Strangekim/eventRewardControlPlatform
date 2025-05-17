@@ -74,17 +74,19 @@ export class EventService {
       throw new BadRequestException('올바르지 않은 이벤트 ID입니다.');
     }
 
-    const updated = await this.eventModel.findByIdAndUpdate(
-      id,
-      { status: 'inactive' },
-      { new: true }, // ← 업데이트된 문서 반환
-    ).exec();
-
-    if (!updated) {
+    const event = await this.eventModel.findById(id);
+    if (!event) {
       throw new NotFoundException('이벤트를 찾을 수 없습니다.');
     }
 
-    return updated;
+    if (event.status === 'inactive') {
+      throw new BadRequestException('이미 비활성화된 이벤트입니다.');
+    }
+
+    event.status = 'inactive';
+    await event.save();
+
+    return event;
   }
 
 }
