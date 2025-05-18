@@ -4,12 +4,15 @@ import { Model,Types } from 'mongoose';
 import { Event, EventDocument } from './schemas/event.schemas';
 import { CreateEventDto,CreateRewardDto } from './dto/event.dto'
 import { Reward, RewardDocument } from './schemas/reward.schemas'
+import { User, UserDocument } from './schemas/user.schemas';
 
 @Injectable()
 export class EventService {
   constructor(
     @InjectModel(Reward.name) private rewardModel: Model<RewardDocument>,
     @InjectModel(Event.name) private eventModel: Model<EventDocument>,
+    @InjectModel(User.name, 'authConnection')
+    private userModel: Model<UserDocument>,
   ) {}
 
   // 이벤트 생성하기
@@ -88,5 +91,47 @@ export class EventService {
 
     return event;
   }
+
+  // 사용자 이벤트 참여
+  async joinEvent(eventId: string, userId: string): Promise<any> {
+  if (!Types.ObjectId.isValid(eventId)) {
+    throw new BadRequestException('올바르지 않은 이벤트 ID입니다.');
+  }
+
+  const event = await this.eventModel.findById(eventId).lean();
+  if (!event) {
+    throw new NotFoundException('이벤트를 찾을 수 없습니다.');
+  }
+
+  const user = await this.userModel.findById(userId);
+  if (!user) {
+    throw new NotFoundException('사용자를 찾을 수 없습니다.');
+  }
+
+  const alreadyJoined = user.eventProgress.some(
+    (p) => p.eventId.toString() === eventId,
+  );
+  if (alreadyJoined) {
+    throw new BadRequestException('이미 참여한 이벤트입니다.');
+  }
+
+  // 이벤트 타입별 초기값 정의
+  const initialProgress: Record<string, any> = {};
+  if (event.type === 'login-streak') {
+    initialProgress.login_days = 0;
+  }
+
+  // 다른 이벤트 타입에 따라 분기 가능
+  user.eventProgress.push({
+    eventId: new Types.ObjectId(eventId),
+    type: event.type,
+    current: event.conditions, 
+    lastUpdated: new Date(),
+  });
+
+  await user.save();
+
+  return { message: '이벤트 참여 완료', eventId };
+}
 
 }

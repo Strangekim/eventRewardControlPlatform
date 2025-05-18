@@ -36,6 +36,15 @@ export class EventController {
     }
     return this.eventService.deactivateEvent(id);
   }
+
+  // 이벤트 참여
+  @Post(':id/join')
+  async joinEvent(@Param('id') id: string, @CurrentUser() user) {
+    if (user.role !== 'user' && user.role !== 'admin') {
+      throw new ForbiddenException('사용자만 이벤트 참여가 가능합니다.');
+    }
+    return this.eventService.joinEvent(id, user.id);
+  }
 }
 
 
