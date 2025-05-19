@@ -1,6 +1,7 @@
 # 🎉 이벤트 / 보상 관리 플랫폼
 안녕하세요 PM님!
-말씀하신 수작업 이벤트 관리의 비효율을 해결하고, 운영자·유저·감사자 각각의 역할을 고려한 **이벤트/보상 관리 플랫폼**을 완성했습니다.  
+말씀하신 수작업 이벤트 관리의 비효율을 해결하고,    
+운영자·유저·감사자 각각의 역할을 고려한 **이벤트/보상 관리 플랫폼**을 완성했습니다.  
 이제 운영자는 자유롭게 이벤트를 생성하고 보상을 등록할 수 있으며, 유저는 조건을 만족한 후 직접 보상 요청이 가능합니다.  
 모든 내역은 역할에 따라 조회 및 관리할 수 있어, **정확하고 투명한 운영**이 가능합니다.  
 실제 사내 도구로도 사용될 수 있도록 **확장성과 유지보수성**을 고려하여 설계했습니다.  
@@ -25,6 +26,11 @@ API 접근 : http://{IP}:3000/
 3. 초기 Admin 계정 생성 가이드
   - 서비스에 접근하기 위해서 최소 1개의 ADMIN 계정이 필요합니다.
   - 최초 실행 시에는 `auth/controller/public.controller.ts` 내의 **역할 변경 권한 예외 처리 부분을 잠시 주석 처리**하여, 권한 없이도 역할 변경이 가능하도록 설정해주세요.
+```ts
+// 기존 코드 예시
+@Roles('ADMIN')
+// 위 줄을 주석 처리하여 일시적으로 권한 검사를 우회
+```
 
 4. **.env 파일을 변경 해주세요!**
   - 빠른 테스트를 위해 `.env` 파일 예시를 함께 업로드해두었습니다.
@@ -200,27 +206,25 @@ API 접근 : http://{IP}:3000/
 ### 🔐 AUTH API 명세서
 | 메서드   | 경로                        | 설명           | 권한                    | DTO 구조 / Body 요청                                               |
 | ----- | ------------------------- | ------------ | --------------------- | -------------------------------------------------------------- |
-| POST  | `/auth/register`          | 회원가입         | ❌ 누구나 가능              | `username: string`<br>`password: string`<br>`nickname: string` |
-| POST  | `/auth/login`             | 로그인 (JWT 발급) | ❌ 누구나 가능              | `username: string`<br>`password: string`                       |
-| GET   | `/auth/users`             | 전체 유저 목록 조회  | ✅ `operator`, `admin` | 없음                                                             |
-| PATCH | `/auth/user/:userId/role` | 유저 역할 변경     | ✅ `admin`만 가능         | `role: 'user' \| 'operator' \| 'admin' \| 'auditor'`           |
-`           |
+| `POST`  | `/auth/register`          | 회원가입         | ❌ 누구나 가능              | `username: string`<br>`password: string`<br>`nickname: string` |
+| `POST`  | `/auth/login`             | 로그인 (JWT 발급) | ❌ 누구나 가능              | `username: string`<br>`password: string`                       |
+| `GET`   | `/auth/users`             | 전체 유저 목록 조회  | ✅ `operator`, `admin` | 없음                                                             |
+| `PATCH` | `/auth/user/:userId/role` | 유저 역할 변경     | ✅ `admin`만 가능         | `role: 'user' \| 'operator' \| 'admin' \| 'auditor'`           |
 
 
 ### 📘 EVENT API 명세서
 | 메서드   | 경로                                     | 설명           | 권한                               | DTO 구조 / Body 요청                                                                                                 |
 | ----- | -------------------------------------- | ------------ | -------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| POST  | `/event/create`                        | 이벤트 생성       | ✅ `operator`, `admin`            | `name: string`<br>`description: string`<br>`startDate: Date`<br>`endDate: Date`                                  |
-| GET   | `/event`                               | 모든 이벤트 목록 조회 | ✅ `operator`, `admin`            | 없음                                                                                                               |
-| GET   | `/event/:id`                           | 특정 이벤트 상세 조회 | ✅ `operator`, `admin`            | 없음                                                                                                               |
-| PATCH | `/event/:id/status`                    | 이벤트 마감 처리    | ✅ `operator`, `admin`            | 없음                                                                                                               |
-| POST  | `/event/:id/reward`                    | 보상 등록        | ✅ `operator`, `admin`            | `rewardType: 'point' \| 'item' \| 'coupon'`<br>`amount?: number`<br>`itemCode?: string`<br>`couponCode?: string` |
-| POST  | `/event/:id/join`                      | 이벤트 참여       | ✅ `user`, `admin`                | 없음                                                                                                               |
-| POST  | `/event/:id/reward-request`            | 보상 요청        | ✅ `user`, `admin`                | 없음                                                                                                               |
-| GET   | `/event/reward-request/mine`           | 내 보상 수령 이력   | ✅ `user`, `admin`                | 없음                                                                                                               |
-| GET   | `/event/reward-request/all`            | 전체 보상 이력     | ✅ `operator`, `admin`, `auditor` | 없음                                                                                                               |
-| GET   | `/event/reward-request/event/:eventId` | 특정 이벤트 보상 이력 | ✅ `operator`, `admin`, `auditor` | 없음                                                                                                               |
-                                                                                                          |
+| `POST`  | `/event/create`                        | 이벤트 생성       | ✅ `operator`, `admin`            | `name: string`<br>`description: string`<br>`startDate: Date`<br>`endDate: Date`                                  |
+| `GET`   | `/event`                               | 모든 이벤트 목록 조회 | ✅ `operator`, `admin`            | 없음                                                                                                               |
+| `GET`   | `/event/:id`                           | 특정 이벤트 상세 조회 | ✅ `operator`, `admin`            | 없음                                                                                                               |
+| `PATCH` | `/event/:id/status`                    | 이벤트 마감 처리    | ✅ `operator`, `admin`            | 없음                                                                                                               |
+| `POST`  | `/event/:id/reward`                    | 보상 등록        | ✅ `operator`, `admin`            | `rewardType: 'point' \| 'item' \| 'coupon'`<br>`amount?: number`<br>`itemCode?: string`<br>`couponCode?: string` |
+| `POST`  | `/event/:id/join`                      | 이벤트 참여       | ✅ `user`, `admin`                | 없음                                                                                                               |
+| `POST`  | `/event/:id/reward-request`            | 보상 요청        | ✅ `user`, `admin`                | 없음                                                                                                               |
+| `GET`   | `/event/reward-request/mine`           | 내 보상 수령 이력   | ✅ `user`, `admin`                | 없음                                                                                                               |
+| `GET`   | `/event/reward-request/all`            | 전체 보상 이력     | ✅ `operator`, `admin`, `auditor` | 없음                                                                                                               |
+| `GET`   | `/event/reward-request/event/:eventId` | 특정 이벤트 보상 이력 | ✅ `operator`, `admin`, `auditor` | 없음                                                                                                               |
 
 ---
 
