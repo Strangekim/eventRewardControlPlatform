@@ -8,6 +8,7 @@ import { get } from 'mongoose';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // 회원 가입
   @Post('register') 
   async register(
     @Body() createUserDto: CreateUserDto, ): Promise<{ message: string }> {
@@ -15,6 +16,7 @@ export class AuthController {
     return { message: '회원가입이 완료되었습니다.' };
   }
 
+  // 전체 사용자 계정 정보 가져오기
   @Get('users')
   async getAllUsers(@CurrentUser() user) {
 
@@ -25,15 +27,19 @@ export class AuthController {
     return this.authService.findAllUsers();
   }
 
-  // 롤 변경
-  @Patch('user/:username/role')
-  async updateRole(@Param('username') username: string, @Body() dto: UpdateUserRoleDto, @CurrentUser() user,){
+  // 역할 변경
+  @Patch('user/:userId/role')
+  async updateRoleById(
+    @Param('userId') userId: string,
+    @Body() dto: UpdateUserRoleDto,
+    @CurrentUser() user, // admin 검증은 여기서
+  ) {
 
-    if (!['admin'].includes(user.role)) {
-      throw new ForbiddenException('관리자만 사용할 수 있습니다.');
+    if (user.role !== 'admin') {
+      throw new ForbiddenException('관리자만 역할 변경이 가능합니다.');
     }
 
-    return this.authService.updateUserRole(username, dto);
+    return this.authService.updateUserRole(userId, dto);
   }
 
   // 로그인

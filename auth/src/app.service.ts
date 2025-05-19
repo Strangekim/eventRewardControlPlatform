@@ -37,15 +37,16 @@ export class AuthService {
   }
 
   // 사용자 역할 업데이트
-  async updateUserRole(username: string, dto: UpdateUserRoleDto): Promise<{ message: string }> {
-    const updated = await this.userModel.findOneAndUpdate(
-      { username },
+  async updateUserRole(userId: string, dto: UpdateUserRoleDto): Promise<{ message: string }> {
+    console.log(userId)
+    const updated = await this.userModel.findByIdAndUpdate(
+      userId,
       { role: dto.role },
       { new: true },
     );
 
     if (!updated) {
-      throw new NotFoundException('닉네임을 가진 사용자를 찾을 수 없습니다.');
+      throw new NotFoundException('해당 ID를 가진 사용자를 찾을 수 없습니다.');
     }
 
     return { message: `사용자 역할이 '${dto.role}'로 변경되었습니다.` };
