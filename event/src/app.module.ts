@@ -8,6 +8,8 @@ import { Event, EventSchema } from './schemas/event.schemas';
 import { Reward, RewardSchema } from './schemas/reward.schemas';
 import { User, UserSchema } from './schemas/user.schemas';
 import {RewardRequest,RewardRequestSchema} from './schemas/reward_request.schema'
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './role/roles.guard';
 
 @Module({
   imports: [
@@ -25,6 +27,12 @@ import {RewardRequest,RewardRequestSchema} from './schemas/reward_request.schema
     ]),
   ],
   controllers: [EventController],
-  providers: [EventService],
+  providers: [
+    EventService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

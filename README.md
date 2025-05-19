@@ -1,9 +1,9 @@
 # 🎉 이벤트 / 보상 관리 플랫폼
 안녕하세요 PM님!
-말씀하신 수작업 이벤트 관리의 비효율을 해결하고, 운영자·유저·감사자 각각의 역할을 고려한 **이벤트/보상 관리 플랫폼**을 완성했습니다.
-이제 운영자는 자유롭게 이벤트를 생성하고 보상을 등록할 수 있으며, 유저는 조건을 만족한 후 직접 보상 요청이 가능합니다.
-모든 내역은 역할에 따라 조회 및 관리할 수 있어, **정확하고 투명한 운영**이 가능합니다.
-실제 사내 도구로도 사용될 수 있도록 **확장성과 유지보수성**을 고려하여 설계했습니다. 
+말씀하신 수작업 이벤트 관리의 비효율을 해결하고, 운영자·유저·감사자 각각의 역할을 고려한 **이벤트/보상 관리 플랫폼**을 완성했습니다.  
+이제 운영자는 자유롭게 이벤트를 생성하고 보상을 등록할 수 있으며, 유저는 조건을 만족한 후 직접 보상 요청이 가능합니다.  
+모든 내역은 역할에 따라 조회 및 관리할 수 있어, **정확하고 투명한 운영**이 가능합니다.  
+실제 사내 도구로도 사용될 수 있도록 **확장성과 유지보수성**을 고려하여 설계했습니다.  
 
 확인해보시고 개선사항이 있다면 언제든 말씀 주세요! 
 
@@ -11,8 +11,7 @@
 
 
 ## 실행 방법
-0. Docker 환경 준비
-  - Docker, Docker Compose가 설치되어 있어야 합니다.
+0. **Docker, Docker Compose**가 설치되어 있어야 합니다.
 
 1. Docker 컨테이너 빌드 및 실행
 
@@ -134,9 +133,9 @@ API 접근 : http://{IP}:3000/
 ### 3️⃣ 사용자 이벤트 참여
 - 사용자가 `/event/:id/join API`를 통해 이벤트에 참여합니다.
 - 라우팅 흐름 :
-  - 1. 유저가 `POST /event/:id/join` 호출
-  - 2. Gateway 서버 → `event-service`
-  - 3. `event-service` → 내부 HTTP 요청 → `auth-service`
+  - 유저가 `POST /event/:id/join` 호출
+  - Gateway 서버 → `event-service`
+  - `event-service` → 내부 HTTP 요청 → `auth-service`
 - 참여 시, `auth-service`의 `user` 컬렉션에서 해당 유저의 `eventProgress` 배열에 새 항목이 다음과 같이 기록됩니다:
 
 ```ts
@@ -156,10 +155,10 @@ API 접근 : http://{IP}:3000/
 ### 4️⃣ 보상 요청 및 수령
 - 사용자가 `/event/:id/reward-request` API를 호출하여 보상을 수령합니다.
 - 라우팅 흐름 :
-  - 1. 유저가 `POST /event/:id/reward` 호출
-  - 2. `event-service`가 `auth-service`의 내부 API 호출
-  - 3. `auth-service` → `user.eventProgress[*].rewardReceived` 성공시 true로 전환
-  - 4. `event-service` 성공/실패 기록 로그 저장
+  - 유저가 `POST /event/:id/reward` 호출
+  - `event-service`가 `auth-service`의 내부 API 호출
+  - `auth-service` → `user.eventProgress[*].rewardReceived` 성공시 true로 전환
+  - `event-service` 성공/실패 기록 로그 저장
 - 보상 요청 이력이 다음과 같이 기록됩니다.
 
 ```ts
@@ -184,7 +183,7 @@ API 접근 : http://{IP}:3000/
 - **Microservice 구조 기반 명확한 책임 분리**로, 유지보수와 확장성에 강한 구조를 가졌습니다.
 
 
-### 🔧 시간이 남는다면, 이런 리펙토링을...
+### 🔧 시간이 더 주어진다면, 이런 리펙토링을...
 - **공통 예외 처리 추상화**
   - 각 서비스에서 반복되는 에러 핸들링을 `CustomErrorHandler` 클래스 등으로 통합.
 - **페이지네이션 도입**

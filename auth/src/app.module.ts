@@ -6,6 +6,8 @@ import { AuthController } from './controller/public.controller';
 import { InternalController } from './controller/internal.controller';
 import { AuthService } from './app.service';
 import { User, UserSchema } from './schemas/user.schema';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './role/roles.guard';
 
 @Module({
   imports: [
@@ -34,6 +36,12 @@ import { User, UserSchema } from './schemas/user.schema';
     }),
   ],
   controllers: [AuthController,InternalController],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}
