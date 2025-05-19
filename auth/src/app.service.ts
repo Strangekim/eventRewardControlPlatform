@@ -1,4 +1,4 @@
-import { Injectable, ConflictException,BadRequestException,NotFoundException,UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException,BadRequestException,NotFoundException,UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model,Types } from 'mongoose';
@@ -72,5 +72,59 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
 
     return { accessToken: token };
+  }
+
+  // 유저 event에 참여
+  async joinUserToEvent(
+    userId: string,
+    eventId: string,
+    type: string,
+    conditions: Record<string, any>,
+  ) {
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new NotFoundException('사용자 없음');
+
+    const alreadyJoined = user.eventProgress.some(
+      (p) => p.eventId.toString() === eventId,
+    );
+    if (alreadyJoined) {
+      throw new BadRequestException('이미 참여한 이벤트입니다.');
+    }
+    
+    user.eventProgress.push({
+      eventId: eventId,
+      type,
+      current: conditions,
+      lastUpdated: new Date(),
+      rewardReceived: false,
+    });
+
+    await user.save();
+
+    return { message: '이벤트 참여 완료' };
+  }
+
+  // 보상 추가
+  async markRewardReceived(userId: string, eventId: string): Promise<{ message: string }> {
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+
+    const progressIndex = user.eventProgress.findIndex(
+      (p) => p.eventId.toString() === eventId,
+    );
+    if (progressIndex === -1) {
+      throw new ForbiddenException('해당 이벤트에 참여하지 않았습니다.');
+    }
+
+    const progress = user.eventProgress[progressIndex];
+    if (progress.rewardReceived) {
+      throw new ForbiddenException('이미 보상을 수령했습니다.');
+    }
+
+    user.eventProgress[progressIndex].rewardReceived = true;
+    user.markModified('eventProgress');
+    await user.save();
+
+    return { message: '보상 상태 갱신 완료' };
   }
 }

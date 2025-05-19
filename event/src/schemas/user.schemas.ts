@@ -18,6 +18,7 @@ export class User {
         type: { type: String },
         current: { type: Object },
         lastUpdated: { type: Date },
+        rewardReceived: { type: Boolean, default: false }, 
       },
     ],
     default: [],
@@ -27,6 +28,7 @@ export class User {
     type: string;
     current: Record<string, any>;
     lastUpdated: Date;
+    rewardReceived?: boolean;
   }[];
 }
 

@@ -4,32 +4,32 @@ services:
   auth:
     build: ./auth
     platform: linux/amd64
-    ports:
-      - "3001:3000"
     depends_on:
       - mongo-auth
     env_file:
       - ./auth/.env
     networks:
       - ercp-network
+    expose:
+      - "3000" # 내부에서만 접근 가능 (gateway용)
 
   event:
     build: ./event
     platform: linux/amd64
-    ports:
-      - "3002:3000"
     depends_on:
       - mongo-event
     env_file:
       - ./event/.env
     networks:
       - ercp-network
+    expose:
+      - "3000" # 내부에서만 접근 가능 (gateway용)
 
   gateway:
     build: ./gateway
     platform: linux/amd64
     ports:
-      - "3000:3000"
+      - "3000:3000" # 오직 gateway만 외부 노출
     networks:
       - ercp-network
 
@@ -38,10 +38,8 @@ services:
     platform: linux/amd64
     container_name: mongo-auth
     restart: always
-    ports:
-      - "27017:27017"   # 필요 시 제거 (외부 접근 차단용)
     volumes:
-      - mongo-auth-data:/data/db
+      - ./mongo-auth-data:/data/db
     networks:
       - ercp-network
 
@@ -50,16 +48,10 @@ services:
     platform: linux/amd64
     container_name: mongo-event
     restart: always
-    ports:
-      - "27018:27017"   # 필요 시 제거
     volumes:
-      - mongo-event-data:/data/db
+      - ./mongo-event-data:/data/db
     networks:
       - ercp-network
-
-volumes:
-  mongo-auth-data:
-  mongo-event-data:
 
 networks:
   ercp-network:

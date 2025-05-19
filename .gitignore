@@ -11,3 +11,7 @@ yarn-error.log*
 # Docker
 *.local
 docker-compose.override.yml
+
+# MongoDB 볼륨 데이터 제외
+mongo-auth-data/
+mongo-event-data/

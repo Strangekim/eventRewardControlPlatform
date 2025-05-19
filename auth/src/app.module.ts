@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt'
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthController } from './app.controller';
+import { AuthController } from './controller/public.controller';
+import { InternalController } from './controller/internal.controller';
 import { AuthService } from './app.service';
 import { User, UserSchema } from './schemas/user.schema';
 
@@ -32,7 +33,7 @@ import { User, UserSchema } from './schemas/user.schema';
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController,InternalController],
   providers: [AuthService],
 })
 export class AppModule {}

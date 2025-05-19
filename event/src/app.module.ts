@@ -1,35 +1,30 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PingController, EventController } from './app.controller';
+import { EventController } from './app.controller';
 import { EventService } from './app.service';
 import { Event, EventSchema } from './schemas/event.schemas';
 import { Reward, RewardSchema } from './schemas/reward.schemas';
 import { User, UserSchema } from './schemas/user.schemas';
+import {RewardRequest,RewardRequestSchema} from './schemas/reward_request.schema'
 
 @Module({
   imports: [
+    HttpModule,
     ConfigModule.forRoot({ isGlobal: true }),
 
-    // 1️⃣ 이벤트 DB 연결
-    MongooseModule.forRoot(process.env.MONGO_EVENT_URI!), // event DB
-    MongooseModule.forRoot(process.env.MONGO_AUTH_URI!, {
-      connectionName: 'authConnection', // ← 이거 누락됐음
-    }),
+    // 이벤트 DB 연결
+    MongooseModule.forRoot(process.env.MONGO_EVENT_URI!), // 기본 연결
 
-    // 2️⃣ 유저(auth) DB 연결 추가 (이름 지정 필수)
-    MongooseModule.forFeature(
-      [{ name: User.name, schema: UserSchema }],
-      'authConnection', // 별명
-    ),
-
-    // 3️⃣ 이벤트 DB의 모델들 (기본 커넥션)
+    // 이벤트 관련 모델들
     MongooseModule.forFeature([
       { name: Event.name, schema: EventSchema },
       { name: Reward.name, schema: RewardSchema },
+      { name: RewardRequest.name, schema: RewardRequestSchema },
     ]),
   ],
-  controllers: [PingController, EventController],
+  controllers: [EventController],
   providers: [EventService],
 })
 export class AppModule {}

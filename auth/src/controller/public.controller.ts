@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Patch, Param,ForbiddenException  } from '@nestjs/common';
-import { AuthService } from './app.service';
-import { CreateUserDto,UpdateUserRoleDto,LoginDto } from './dto/user.dto';
-import { CurrentUser } from './common/current-user.decorator'
+import { AuthService } from '../app.service';
+import { CreateUserDto,UpdateUserRoleDto,LoginDto } from '../dto/user.dto';
+import { CurrentUser } from '../common/current-user.decorator'
 import { get } from 'mongoose';
 
 @Controller('') // => /auth 경로 아래
@@ -16,21 +16,22 @@ export class AuthController {
   }
 
   @Get('users')
-  async getAllUsers() {
+  async getAllUsers(@CurrentUser() user) {
+
+    if (!['operator', 'admin'].includes(user.role)) {
+      throw new ForbiddenException('운영자,관리자만 사용할 수 있습니다.');
+    }
+    
     return this.authService.findAllUsers();
   }
 
   // 롤 변경
   @Patch('user/:username/role')
-  async updateRole(
-    @Param('username') username: string,
-    @Body() dto: UpdateUserRoleDto,
-    @CurrentUser() user,
-  ) {
-    console.log(user)
-    if (user.role !== 'admin') {
-    throw new ForbiddenException('관리자만 역할 변경이 가능합니다.');
-  }
+  async updateRole(@Param('username') username: string, @Body() dto: UpdateUserRoleDto, @CurrentUser() user,){
+
+    if (!['admin'].includes(user.role)) {
+      throw new ForbiddenException('관리자만 사용할 수 있습니다.');
+    }
 
     return this.authService.updateUserRole(username, dto);
   }

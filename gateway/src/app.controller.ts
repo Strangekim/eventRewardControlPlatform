@@ -58,10 +58,3 @@ export class AppController {
   }
 }
 
-// @Controller('ping')
-// export class PingController {
-//   @Get()
-//   getPong() {
-//     return { message: 'gateway 서버 접속' };
-//   }
-// }
