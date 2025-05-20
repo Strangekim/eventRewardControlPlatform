@@ -8,8 +8,6 @@ services:
     platform: linux/amd64
     depends_on:
       - mongo-auth
-    env_file:
-      - ./auth/.env
     networks:
       - ercp-network
     expose:
@@ -22,8 +20,6 @@ services:
     platform: linux/amd64
     depends_on:
       - mongo-event
-    env_file:
-      - ./event/.env
     networks:
       - ercp-network
     expose:

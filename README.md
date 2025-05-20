@@ -11,20 +11,36 @@
 ---
 
 
-## 실행 방법
-0. **Docker, Docker Compose**가 설치되어 있어야 합니다.
+## 💻 실행 방법
+### 0️⃣ **Docker, Docker Compose**가 설치되어 있어야 합니다.
 
-1. Docker 컨테이너 빌드 및 실행
+### 1️⃣ 프로젝트 클론 
+
+```bash
+git clone https://github.com/your-username/eventRewardControlPlatform.git
+cd eventRewardControlPlatform
+```
+
+> ⚠️ Docker 컨테이너 내부에서 `npm install`은 자동으로 수행되지만,  
+> VS Code에서 타입 지원을 위해서는 로컬에서도 `npm install`이 필요합니다.
+
+```bash
+cd auth && npm install
+cd ../event && npm install
+cd ../gateway && npm install
+```
+
+### 2️⃣ Docker 컨테이너 빌드 및 실행
 
 ```bash
 docker compose up --build
 ```
 
-2. 접속 경로
-API 접근 : http://{IP}:3000/
+### 3️⃣ 접속 경로
+**API 접근 : http://{IP}:3000/**
 
-3. 초기 Admin 계정 생성 가이드
-  - 서비스에 접근하기 위해서 최소 1개의 ADMIN 계정이 필요합니다.
+### 4️⃣ **초기 Admin 계정 생성 가이드**
+  - 서비스에 접근하기 위해서 **최소 1개의 ADMIN 계정**이 필요합니다.
   - 최초 실행 시에는 `auth/controller/public.controller.ts` 내의 **역할 변경 권한 예외 처리 부분을 잠시 주석 처리**하여, 권한 없이도 역할 변경이 가능하도록 설정해주세요.
 ```ts
 // 기존 코드 예시
@@ -32,7 +48,7 @@ API 접근 : http://{IP}:3000/
 // 위 줄을 주석 처리하여 일시적으로 권한 검사를 우회
 ```
 
-4. **.env 파일을 변경 해주세요!**
+### 5️⃣ **.env 파일을 변경 해주세요!**
   - 빠른 테스트를 위해 `.env` 파일 예시를 함께 업로드해두었습니다.
   - **실제 운영 환경에서는 보안상 .env 파일을 절대 공개하지 말아주세요.**
   - 각 서비스 디렉토리(`auth/`, `event/`, `gateway/`)에 `.env` 파일이 존재해야 정상 실행됩니다.
