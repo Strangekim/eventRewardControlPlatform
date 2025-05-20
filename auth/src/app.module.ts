@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt'
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -6,7 +7,7 @@ import { AuthController } from './controller/public.controller';
 import { InternalController } from './controller/internal.controller';
 import { AuthService } from './app.service';
 import { User, UserSchema } from './schemas/user.schema';
-import { APP_GUARD } from '@nestjs/core';
+
 import { RolesGuard } from './role/roles.guard';
 
 @Module({

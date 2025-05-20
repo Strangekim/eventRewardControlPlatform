@@ -3,10 +3,8 @@ import { AuthService } from '../app.service';
 import { CreateUserDto,UpdateUserRoleDto,LoginDto } from '../dto/user.dto';
 import { CurrentUser } from '../common/current-user.decorator'
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { Roles } from '../role/roles.decorator'; // 경로는 너 프로젝트 구조에 따라
+import { Roles } from '../role/roles.decorator'; 
 import { RolesGuard } from '../role/roles.guard';
-import { get } from 'mongoose';
 
 @Controller('') // => /auth 경로 아래
 export class AuthController {

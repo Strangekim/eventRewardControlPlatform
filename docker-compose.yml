@@ -3,6 +3,8 @@ version: '3.8'
 services:
   auth:
     build: ./auth
+    env_file:
+    - ./auth/.env
     platform: linux/amd64
     depends_on:
       - mongo-auth
@@ -15,6 +17,8 @@ services:
 
   event:
     build: ./event
+    env_file:
+    - ./event/.env
     platform: linux/amd64
     depends_on:
       - mongo-event
@@ -27,6 +31,8 @@ services:
 
   gateway:
     build: ./gateway
+    env_file:
+    - ./gateway/.env
     platform: linux/amd64
     ports:
       - "3000:3000" # 오직 gateway만 외부 노출
