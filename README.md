@@ -17,7 +17,7 @@
 ### 1️⃣ 프로젝트 클론 
 
 ```bash
-git clone https://github.com/your-username/eventRewardControlPlatform.git
+git clone git clone https://github.com/Strangekim/eventRewardControlPlatform.git 
 cd eventRewardControlPlatform
 ```
 
@@ -73,9 +73,9 @@ docker compose up --build
   "joinedAt": ISODate()
 }
 ```
-🎯 guest 역할 도입 이유
+**🎯 guest 역할 도입 이유**
  - 가입 즉시 `user` 역할을 부여할 경우,
-**권한 검증 없이 이벤트 참여 및 보상 요청이 가능해져 기능상 허점**이 발생함.
+**권한 검증 없이 이벤트 참여 및 보상 요청이 가능해져 기능상 허점**이 발생할 수 있습니다.
 - 따라서 모든 신규 계정은 `guest`로 등록되며, **관리자(admin)의 승인이 있어야 권한이 격상**됩니다.
 
 ---
@@ -102,10 +102,20 @@ docker compose up --build
 
 --- 
 
-### ✅ 예시 흐름: 신규 사용자 가입 후 권한 격상까지
-1. `POST /auth/signup` → `role: guest`로 가입
+### 5️⃣ [추후 도입 제안] 내부/외부망 구분 기반 자동 권한 부여 시스템
+- 실제 서비스 도입 시, 사용자의  접속 IP 또는 도메인 등을 기반으로 사내망 여부를 식별.
+- 사내망일 경우에는 기본 권한을 `guest`로 유지하여 **무단 보상 취득 방지**
+- 외부망에서의 정식 가입일 경우에는 바로 user 역할로 등록되도록 구성할 수 있습니다.
 
-2. `PATCH /auth/user/:username/role` (관리자) → `role: user`로 승격
+> ✅ 이 시스템을 통해 **사내 테스트/운영 중 발생할 수 있는 권한 남용**을 막고,
+> 외부 사용자는 더 빠르게 보상 기능을 체험할 수 있는 구조를 구현할 수 있습니다.
+
+---
+
+### ✅ 예시 흐름: 신규 사용자 가입 후 권한 격상까지
+1. `POST /auth/register` → `role: guest`로 가입
+
+2. `PATCH /auth/user/:userId/role` (관리자) → `role: user`로 승격
 
 3. `POST /event/:id/join` → 이벤트 참여 가능
 
@@ -119,7 +129,7 @@ docker compose up --build
 
 ### 1️⃣ 이벤트 등록
 
-- **관리자** 또는 **운영자**가 `/event/create` 엔드포인트로 새로운 이벤트를 생성합니다.
+- **관리자** 또는 **운영자**가 `POST /event/create` 엔드포인트로 새로운 이벤트를 생성합니다.
 - 이벤트는 다음 정보를 포함합니다:
 ```ts
 {
@@ -136,7 +146,7 @@ docker compose up --build
 ---
 
 ### 2️⃣ 보상 등록
-- 등록된 이벤트에 대해 운영자는 `/event/:id/reward` API를 통해 보상을 추가합니다.
+- 등록된 이벤트에 대해 운영자는 `POST /event/:id/reward` API를 통해 보상을 추가합니다.
 - 보상은 `point`, `item`, `coupon` 타입을 가집니다.
 - 이벤트 보상은 다음 정보를 포함합니다:
 ```ts
@@ -153,7 +163,7 @@ docker compose up --build
 ---
 
 ### 3️⃣ 사용자 이벤트 참여
-- 사용자가 `/event/:id/join API`를 통해 이벤트에 참여합니다.
+- 사용자가 `POST /event/:id/join` API 를 통해 이벤트에 참여합니다.
 - 라우팅 흐름 :
   - 유저가 `POST /event/:id/join` 호출
   - Gateway 서버 → `event-service`
@@ -175,7 +185,7 @@ docker compose up --build
 ---
 
 ### 4️⃣ 보상 요청 및 수령
-- 사용자가 `/event/:id/reward-request` API를 호출하여 보상을 수령합니다.
+- 사용자가 `POST /event/:id/reward-request` API를 호출하여 보상을 수령합니다.
 - 라우팅 흐름 :
   - 유저가 `POST /event/:id/reward` 호출
   - `event-service`가 `auth-service`의 내부 API 호출
@@ -202,7 +212,7 @@ docker compose up --build
 ### 👍 장점
 - guest 권한 도입으로 **운영자, 감시자의 이벤트 부정 수급, 내역 확인등의 행위를 원천 차단**할 수 있습니다.
 - **다양한 형태**의 이벤트와, 보상 등록, 유저의 보상 지급 상태를 **유연하게 관리**할 수 있습니다.
-- **Microservice 구조 기반 명확한 책임 분리**로, 유지보수와 확장성에 강한 구조를 가졌습니다.
+- **MSA 구조 기반 명확한 책임 분리**로, 유지보수와 확장성에 강한 구조를 가졌습니다.
 
 
 ### 🔧 시간이 더 주어진다면, 이런 리펙토링을...
